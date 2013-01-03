@@ -33,9 +33,10 @@ module iterators
      procedure :: next => ai_next
   end type array_iterator
 
-  interface array_iterator
+  interface create_iterator
      module procedure ai_create
-  end interface array_iterator
+  end interface create_iterator
+  public :: create_iterator
 
 contains
 
@@ -50,7 +51,7 @@ contains
   function ai_has_next(self)
     class(array_iterator), intent(in) :: self
     logical                           :: ai_has_next
-    ai_has_next = self%idx < ubound(self%array,1)
+    ai_has_next = self%idx <= ubound(self%array,1)
   end function ai_has_next
 
   function ai_next(self)
@@ -69,10 +70,27 @@ program iterators_test
 
   use iterators
 
-  real :: x(10) = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
-  type(array_iterator) :: it
+  real :: x(-1:8) = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
   
-  it = array_iterator(x)
+  call dump(create_iterator(x))
+
+contains
+
+  subroutine dump(it)
+    class(iterator)   :: it
+    class(*), pointer :: v
+
+    do while(it%has_next())
+       v => it%next()
+
+       select type(v)
+       type is (real)
+          print *, "=>", v
+       class default
+          stop "UNKNOWN CLASS"
+       end select
+    end do
+  end subroutine dump
 
 end program iterators_test
 
