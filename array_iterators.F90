@@ -4,6 +4,9 @@ module array_iterators
 
   private
   
+  !> The iterator over an array
+  !> @extends iterators::iterator
+   
   type, public, extends(iterator) :: array_iterator
      private
      integer           :: idx
@@ -13,9 +16,9 @@ module array_iterators
      procedure :: next => ai_next
   end type array_iterator
 
-  interface array_iterator
+  interface forward_array_iterator
      module procedure ai_create
-  end interface array_iterator
+  end interface forward_array_iterator
 
   interface reverse_array_iterator
      module procedure rai_create
@@ -64,8 +67,8 @@ contains
     integer :: i(5)  = [ 4, 5, 6, 7, 8 ]
  
     print *, "Array iterator tests:"
-    call forward_iterator_real(array_iterator(x), x)
-    call forward_iterator_int(array_iterator(i), i)
+    call forward_iterator_real(forward_array_iterator(x), x)
+    call forward_iterator_int(forward_array_iterator(i), i)
 
     call reverse_iterator_real(reverse_array_iterator(x), x)
 
