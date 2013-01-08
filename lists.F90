@@ -6,15 +6,15 @@ module lists
 
   type :: list_item
      class(*), allocatable    :: value
-     type(list_item), pointer :: next     => null()
-     type(list_item), pointer :: previous => null()
+     class(list_item), pointer :: next     => null()
+     class(list_item), pointer :: previous => null()
   end type list_item
 
   type, public :: list
      private
      integer :: list_size = 0
-     type(list_item), pointer :: first_item => null()
-     type(list_item), pointer :: last_item  => null()
+     class(list_item), pointer :: first_item => null()
+     class(list_item), pointer :: last_item  => null()
    contains
      procedure, public :: size      => lst_size
      procedure, public :: is_empty  => lst_is_empty
@@ -25,9 +25,9 @@ module lists
 
   type, public, extends(iterator) :: list_iterator
      private
-     type(list), pointer      :: parent    => null()
-     type(list_item), pointer :: next_item => null()
-     type(list_item), pointer :: this_item => null()
+     class(list), pointer      :: parent    => null()
+     class(list_item), pointer :: next_item => null()
+     class(list_item), pointer :: this_item => null()
    contains
      procedure, public :: has_next => li_has_next
      procedure, public :: next     => li_next
@@ -130,15 +130,19 @@ program lists_test
 
   use lists
   use iterators
+  use iso_varying_string
 
   type(list) :: l
   type(list_iterator) :: li
   class(*), pointer   :: p
+  type(varying_string):: str
 
   print *, "Empty list size = ", size(l)
 
-  call l%add("Ahoj")
+  str = "Ahoj"
+  call l%add(str)
   call l%add(42)
+  call l%add(3.14)
 
   print *
   print *, "Full list size = ", size(l)
@@ -154,10 +158,10 @@ program lists_test
   print *, "Short list size = ", size(l)
   call dump( l%iterator() )
 
-  call l%add("Kuku")
-  call l%add(1)
-  call l%add("Baf")
-  call l%add(2)
+!!$  call l%add( var_str("Kuku") )
+!!$  call l%add(1)
+!!$  call l%add( var_str("Baf") )
+!!$  call l%add(2)
 
   print *
   print *, "Long list size = ", size(l)
@@ -185,6 +189,9 @@ contains
           print *, "integer =>", v
        type is (character(len=*))
           print *, "string  =>", v
+       type is (varying_string)
+          print *, "varying_string  =>", char(v)
+          
        class default
           stop "UNKNOWN CLASS"
        end select
