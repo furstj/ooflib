@@ -12,6 +12,8 @@ link_directories(
 add_library(ooflib
 	iterators.F90
 	array_iterators.F90
+	collections.F90
+	lists.F90
 )
 
 add_executable(ooflib_test

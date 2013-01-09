@@ -1,3 +1,21 @@
+!======================================================================
+!
+!          Copyright Jiri Furst 2013
+! Distributed under the Boost Software License, Version 1.0.
+!    (See accompanying file LICENSE_1_0.txt or copy at
+!          http://www.boost.org/LICENSE_1_0.txt)
+!
+!----------------------------------------------------------------------
+!
+!  MODULE: array_iterators
+!
+!> @author Jiri Furst
+!
+!  DESCRIPTION: 
+!> The module defines iterators for rank-1 arrays
+!
+!======================================================================
+
 module array_iterators
 
   use iterators
@@ -16,33 +34,37 @@ module array_iterators
      procedure :: next => ai_next
   end type array_iterator
 
-  interface forward_array_iterator
-     module procedure ai_create
-  end interface forward_array_iterator
 
-  interface reverse_array_iterator
-     module procedure rai_create
-  end interface reverse_array_iterator
-
-
+  public :: forward_array_iterator
+  public :: reverse_array_iterator
   public :: array_iterators_test
 
 contains
 
-  function ai_create(array) result(it)
+  !> Creates an iterator going an array in ascending index order
+  !!
+  !! \param [in] array    - the rank-1 array
+  !! \result the iterator
+  !
+  function forward_array_iterator(array) result(it)
     class(*), target     :: array(:)
     type(array_iterator) :: it
 
     it%array => array(:)
     it%idx = lbound(it%array,1)
-  end function ai_create
+  end function forward_array_iterator
 
-  function rai_create(array) result(it)
+  !> Creates an iterator going an array in descending index order
+  !!
+  !! \param [in] array    - the rank-1 array
+  !! \result the iterator
+  !
+  function reverse_array_iterator(array) result(it)
     class(*), target     :: array(:)
     type(array_iterator) :: it
     it%array => array(::-1)
     it%idx = lbound(it%array,1)
-  end function rai_create
+  end function reverse_array_iterator
 
   function ai_has_next(self)
     class(array_iterator), intent(in) :: self
@@ -60,8 +82,9 @@ contains
 
   !======================================================================
   ! test
-  !======================================================================
-  
+  !
+  !> Simple test for array iterators
+  !
   subroutine array_iterators_test
     real :: x(-1:8) = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
     integer :: i(5)  = [ 4, 5, 6, 7, 8 ]

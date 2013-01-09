@@ -55,19 +55,17 @@ module iterators
 
 
   abstract interface
-     !> \interface iterator_has_next
-     function iterator_has_next(self)
-       import iterator
-       class(iterator), intent(in) :: self
-       logical                     :: iterator_has_next
-     end function iterator_has_next
-
-     !> \interface iterator_next
      function iterator_next(self)
        import iterator
        class(iterator), intent(inout) :: self
        class(*), pointer              :: iterator_next
      end function iterator_next
+
+     function iterator_has_next(self)
+       import iterator
+       class(iterator), intent(in) :: self
+       logical                     :: iterator_has_next
+     end function iterator_has_next
   end interface
 
 
