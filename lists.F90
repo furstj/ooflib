@@ -12,43 +12,45 @@
 !> @author Jiri Furst
 !
 !  DESCRIPTION: 
-!> The module defines abstract listss
+!> The module defines single linked list of generic objects
 !
 !======================================================================
 
 module lists
 
+  use objects
   use iterators
   use collections
 
   private
 
-  type :: list_item
-     class(*), allocatable    :: value
-     class(list_item), pointer :: next     => null()
-     class(list_item), pointer :: previous => null()
+  type, extends(object) :: list_item
+     class(list_item), pointer :: next => null()
+     class(*), allocatable     :: val
   end type list_item
 
+  !> The single linked list of generic objects
+  !!
   type, public, extends(collection) :: list
      private
      integer :: size_ = 0
-     class(list_item), pointer :: first_item => null()
-     class(list_item), pointer :: last_item  => null()
+     type(list_item)  :: first_ptr    !< pointer to first item 
+     type(list_item)  :: last_ptr     !< pointer to last item
    contains
      procedure, public :: size      => lst_size
      procedure, public :: add       => lst_add
      procedure, public :: iterator  => lst_iterator
-     procedure, public :: remove    => lst_remove
   end type list
 
   type, public, extends(iterator) :: list_iterator
      private
      class(list), pointer      :: parent    => null()
-     class(list_item), pointer :: next_item => null()
-     class(list_item), pointer :: this_item => null()
+     class(list_item), pointer :: item => null()
+     class(list_item), pointer :: last => null()
    contains
      procedure, public :: has_next => li_has_next
      procedure, public :: next     => li_next
+     procedure, public :: remove   => li_remove
   end type list_iterator
 
   public :: lists_test
@@ -67,15 +69,14 @@ contains
     type(list_item), pointer   :: item
 
     allocate(item)
-    allocate(item%value, source=o)
+    allocate(item%val, source=o)
 
     if ( self%is_empty() ) then
-       self%first_item => item
+       self%first_ptr%next => item
     else
-       item%previous => self%last_item
-       self%last_item%next => item
+       self%last_ptr%next%next => item
     end if
-    self%last_item => item
+    self%last_ptr%next => item
     self%size_ = self%size_ + 1 
   end subroutine lst_add
 
@@ -86,38 +87,9 @@ contains
     select type(lst_iterator)
     type is (list_iterator)
        lst_iterator%parent => self
-       lst_iterator%next_item => self%first_item
+       lst_iterator%item   => self%first_ptr
     end select
   end function lst_iterator
-
-  subroutine lst_remove(self, iter)
-    class(list), intent(inout)     :: self
-    class(iterator), intent(inout) :: iter
-    class(list_item), pointer :: item
-    select type(iter)
-    class is (list_iterator)
-       item => iter%this_item
-       if (associated(item%previous)) then
-          item%previous%next => item%next
-       else
-          self%first_item => item%next
-       end if
-       
-       if (associated(item%next)) then
-          item%next%previous => item%previous
-       else
-          self%last_item => item%previous
-       end if
-       self%size_ = self%size_ - 1
-       
-       deallocate(item%value)
-       deallocate(item)
-       iter%this_item=>null()
-    class default
-       stop "inconsistency of iterator type in list::remove"
-    end select
-  end subroutine lst_remove
-
 
 
   !======================================================================
@@ -125,16 +97,27 @@ contains
   !======================================================================
   logical function li_has_next(self)
     class(list_iterator), intent(in) :: self
-    li_has_next = associated(self%next_item) 
+    li_has_next = associated(self%item%next) 
   end function li_has_next
 
   function li_next(self)
     class(list_iterator), intent(inout) :: self
     class(*), pointer                   :: li_next
-    self%this_item => self%next_item
-    self%next_item => self%this_item%next
-    li_next => self%this_item%value
+    self%last => self%item
+    self%item => self%item%next
+    li_next => self%item%val
   end function li_next
+
+  subroutine li_remove(self)
+    class(list_iterator), intent(inout) :: self
+    class(list_item), pointer :: tmp
+    if (.not. associated(self%last)) stop "Error in list_iterator::remove"
+    self%last%next => self%item%next
+    self%parent%size_ = self%parent%size_ - 1
+    tmp => self%item
+    self%item => self%last
+    deallocate(tmp)
+  end subroutine li_remove
 
   
   !======================================================================
@@ -176,7 +159,7 @@ contains
       allocate(iter, source=l%iterator())
       o=>iter%next()  ! Points to 2
       o=>iter%next()  ! Points to 4
-      call l%remove(iter)
+      call iter%remove()
       if (l%size() /= 2) stop "short list size /= 2!"
       deallocate(iter)
 

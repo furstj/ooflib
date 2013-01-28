@@ -10,10 +10,12 @@ link_directories(
 ) 
 
 add_library(ooflib
+	objects.F90
 	iterators.F90
 	array_iterators.F90
 	collections.F90
 	lists.F90
+	queues.F90
 )
 
 add_executable(ooflib_test

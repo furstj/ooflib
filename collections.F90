@@ -18,6 +18,7 @@
 
 module collections
 
+  use objects
   use iterators
 
   implicit none
@@ -31,7 +32,7 @@ module collections
   !! of elements and provides some basic operations with the elements and 
   !! collections
   !!
-  type, public, abstract :: collection
+  type, abstract, extends(object), public :: collection
      
    contains
 
@@ -48,11 +49,12 @@ module collections
 
      !> Returns an iterator
      !> \result an iterator, `class(iterator), allocatable`
-     !procedure(coll_iterator), deferred, public :: iterator
-     procedure, public :: iterator => coll_iterator
+     procedure(coll_iterator),deferred,  public :: iterator 
 
-     !> Removes an element given by the itereator
-     procedure(coll_remove), deferred, public   :: remove 
+     !> Removes given object
+     !!
+     !! \param[in] o the object to be removed
+     procedure, public   :: remove
 
      !> Clears the collections
      procedure, public :: clear => coll_clear
@@ -85,14 +87,6 @@ module collections
        class(iterator), allocatable          :: coll_iterator
      end function coll_iterator
 
-     
-     subroutine coll_remove(self, iter)
-       use iterators
-       import collection
-       class(collection), intent(inout) :: self
-       class(iterator), intent(inout)   :: iter
-     end subroutine coll_remove
-
   end interface
 
 
@@ -111,8 +105,26 @@ contains
     allocate(iter, source=self%iterator())
     do while (iter%has_next())
        o => iter%next()
-       call self%remove(iter)
+       call iter%remove()
     end do
   end subroutine coll_clear
+
+  subroutine remove(self, o, stat)
+    class(collection), intent(inout) :: self     !< the collection
+    class(object), intent(in)        :: o        !< the object to be removed
+    integer, optional, intent(out)   :: stat     !< 0 if removal was succesfull
+    class(iterator), allocatable :: iter
+    class(*), pointer  :: p
+    allocate(iter, source=self%iterator())
+    do while (iter%has_next())
+       p => iter%next()
+       if (p == o) then          
+          call iter%remove()
+          if (present(stat)) stat = 0
+          return
+       end if
+    end do
+    if (present(stat)) stat = 1
+  end subroutine remove
 
 end module collections
