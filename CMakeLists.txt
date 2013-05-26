@@ -14,6 +14,7 @@ add_library(ooflib
 	array_iterators.F90
 	collections.F90
 	lists.F90
+	rationals.F90
 )
 
 add_executable(ooflib_test
