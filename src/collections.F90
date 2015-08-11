@@ -118,7 +118,7 @@ contains
     allocate(iter, source=self%iterator())
     do while (iter%has_next())
        p => iter%next()
-       if (p == o) then          
+       if (o == p) then          
           call iter%remove()
           if (present(stat)) stat = 0
           return

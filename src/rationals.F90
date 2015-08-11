@@ -23,43 +23,43 @@ module rationals
   type, public :: rational
      integer :: numerator   = 0
      integer :: denominator = 1
-  end type rational
+  end type 
 
   interface real
      module procedure real_rat
-  end interface real
+  end interface 
   public :: real
 
   interface assignment(=)
      module procedure assign_int
-  end interface assignment(=)
+  end interface 
 
   interface operator(+)
      module procedure add_rat_rat
      module procedure add_int_rat
      module procedure add_rat_int
-  end interface operator(+)
+  end interface 
   public :: operator(+)
 
   interface operator(-)
      module procedure sub_rat_rat
      module procedure sub_int_rat
      module procedure sub_rat_int
-  end interface operator(-)
+  end interface 
   public :: operator(-)
 
   interface operator(*)
      module procedure mul_rat_rat
      module procedure mul_int_rat
      module procedure mul_rat_int
-  end interface operator(*)
+  end interface 
   public :: operator(*)
 
   interface operator(/)
      module procedure div_rat_rat
      module procedure div_rat_int
      module procedure div_int_rat
-  end interface operator(/)
+  end interface 
   public :: operator(/)
 
 
@@ -75,7 +75,7 @@ contains
   end function real_rat
 
 
-  subroutine assign_int(c, a) result(c)
+  subroutine assign_int(c, a)
     integer, intent(in)         :: a
     type(rational), intent(out) :: c
     c = rational(a, 1)
