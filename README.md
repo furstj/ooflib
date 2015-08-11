@@ -2,6 +2,12 @@
 
 Object Oriented Fortran Library written in Fortran 2008
 
+## Documentation:
+The documentation can be extracted from the source using
+[FORD](https://github.com/cmacmackin/ford). Tutorials and some notes are at
+the project [wiki](https://github.com/furstj/ooflib/wiki).
+
+
 ## Compatibility:
 
 
