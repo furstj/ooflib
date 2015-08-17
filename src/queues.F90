@@ -62,8 +62,8 @@ contains
 
   function q_iterator(self)
     class(queue), target, intent(in) :: self
-    class(iterator), allocatable    :: q_iterator
-    allocate(q_iterator, source = self%container%iterator())
+    type(iterator)                   :: q_iterator
+    q_iterator = self%container%iterator()
   end function q_iterator
 
   subroutine push(self, o)

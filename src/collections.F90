@@ -84,7 +84,7 @@ module collections
        use iterators
        import collection
        class(collection), target, intent(in) :: self
-       class(iterator), allocatable          :: coll_iterator
+       type(iterator)                        :: coll_iterator
      end function coll_iterator
 
   end interface
@@ -100,9 +100,9 @@ contains
 
   subroutine coll_clear(self)
     class(collection), intent(inout) :: self
-    class(iterator), allocatable     :: iter
+    type(iterator)                   :: iter
     class(*), pointer                :: o
-    allocate(iter, source=self%iterator())
+    iter = self%iterator()
     do while (iter%has_next())
        o => iter%next()
        call iter%remove()
@@ -113,9 +113,9 @@ contains
     class(collection), intent(inout) :: self     !< the collection
     class(object), intent(in)        :: o        !< the object to be removed
     integer, optional, intent(out)   :: stat     !< 0 if removal was succesfull
-    class(iterator), allocatable :: iter
+    type(iterator) :: iter
     class(*), pointer  :: p
-    allocate(iter, source=self%iterator())
+    iter = self%iterator()
     do while (iter%has_next())
        p => iter%next()
        if (o == p) then          

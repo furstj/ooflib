@@ -25,7 +25,7 @@ module array_iterators
   !> The iterator over an array
   !> @extends iterators::iterator
    
-  type, public, extends(iterator) :: array_iterator
+  type, public, extends(iterator_base) :: array_iterator
      private
      integer           :: idx
      class(*), pointer :: array(:) => null()
@@ -48,10 +48,13 @@ contains
   !
   function forward_array_iterator(array) result(it)
     class(*), target     :: array(:)
-    type(array_iterator) :: it
-
-    it%array => array(:)
-    it%idx = lbound(it%array,1)
+    type(iterator)       :: it
+    allocate(array_iterator :: it%pimpl)
+    select type(i => it%pimpl)
+    type is (array_iterator)
+       i%array => array(:)
+       i%idx = lbound(i%array,1)
+    end select
   end function forward_array_iterator
 
   !> Creates an iterator going an array in descending index order
@@ -61,9 +64,13 @@ contains
   !
   function reverse_array_iterator(array) result(it)
     class(*), target     :: array(:)
-    type(array_iterator) :: it
-    it%array => array(::-1)
-    it%idx = lbound(it%array,1)
+    type(iterator)       :: it
+    allocate(array_iterator :: it%pimpl)
+    select type(i => it%pimpl)
+    type is (array_iterator)
+       i%array => array(::-1)
+       i%idx = lbound(i%array,1)
+    end select
   end function reverse_array_iterator
 
   function ai_has_next(self)

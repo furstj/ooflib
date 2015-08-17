@@ -3,8 +3,6 @@ project (OOFLib)
 
 enable_language (Fortran)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 link_directories(
 ) 
 
@@ -16,10 +14,13 @@ add_library(ooflib
 	lists.F90
 	rationals.F90
 	queues.F90
+	property_tree.F90
 )
 
 add_executable(ooflib_test
-	ooflib_test.F90
+	../tests/ooflib_test.F90
+	../tests/lists_test.F90
+	../tests/property_tree_test.F90
 )
 
 target_link_libraries(ooflib_test

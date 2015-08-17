@@ -233,6 +233,8 @@ contains
     call rationals_constructors()
     call rationals_operators()
 
+    print *
+
   contains
     
     subroutine rationals_constructors()
