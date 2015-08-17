@@ -264,7 +264,7 @@ contains
     class(ptree), intent(inout)           :: self
     character(len=*), intent(in)          :: path
     type(ptree), pointer, intent(inout)   :: child
-    type(ptree), pointer         :: p, c
+    type(ptree), pointer         :: p
     integer :: i, idx
     p => force_path(self,path)
     i = index(path, ".", back=.true.)
