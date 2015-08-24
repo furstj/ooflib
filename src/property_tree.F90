@@ -134,7 +134,11 @@ contains
     i = index(path, ".")
     if (i>0) then
       p => self%find(path(1:i-1))
-      if (associated(p)) p => p%get_child_by_name(path(i+1:))
+      if (associated(p)) then
+        p => p%get_child_by_name(path(i+1:))
+      else
+        p => null()
+      end if
     else
       p => self%find(path)
     end if
@@ -418,7 +422,7 @@ contains
     real(real64), intent(in)     :: val
     character(len=40) :: str
     write(str,*) val
-    call self%add(path, trim(adjustl(str)))
+    call self%put(path, trim(adjustl(str)))
   end subroutine put_double
 
 
@@ -429,7 +433,7 @@ contains
     logical, intent(in)          :: val
     character(len=40) :: str
     write(str,*) val
-    call self%add(path, trim(adjustl(str)))
+    call self%put(path, trim(adjustl(str)))
   end subroutine put_logical
 
   !======================================================================
@@ -437,6 +441,7 @@ contains
   !======================================================================
 
   function find(self, name, which) result(p)
+    !! Returns the pointer to given child. It doesn't make deep traversal!
     class(ptree), intent(in)      :: self
     character(len=*), intent(in ) :: name
     integer, intent(in), optional :: which
@@ -458,6 +463,7 @@ contains
 
 
   function find_index(self, name, which) result(idx)
+    !! returns the index of a child with given name. It doesn't make deep traversal!
     class(ptree), intent(in)      :: self
     character(len=*), intent(in ) :: name
     integer, intent(in), optional :: which
@@ -594,7 +600,7 @@ contains
         if (e>0) then
           call pt%put(arg(3:e-1), trim(arg(e+1:)))
         else
-          call pt%put(trim(arg(3:e-1)), "true")
+          call pt%put(trim(arg(3:)), .true.)
         endif
       else
         iarg = iarg+1
